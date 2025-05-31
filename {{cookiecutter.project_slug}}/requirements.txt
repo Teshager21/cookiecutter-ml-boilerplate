@@ -1,0 +1,11 @@
+# Core runtime dependencies
+pandas>=1.5.3
+numpy>=1.23.5
+scikit-learn>=1.2.2
+joblib>=1.2.0
+PyYAML>=6.0
+
+# Explicitly add compatible versions to avoid warnings
+requests==2.28.2
+urllib3>=1.26.14,<1.27
+chardet>=3.0,<4.0

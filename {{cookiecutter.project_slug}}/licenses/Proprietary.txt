@@ -1,0 +1,10 @@
+{% if cookiecutter.license == "Proprietary" %}
+Proprietary License
+
+All rights reserved.
+
+This software and associated documentation files (the "Software") are the exclusive property of the owner.  
+You may not use, copy, modify, distribute, or sublicense the Software without explicit prior written permission from the owner.
+
+The Software is provided "AS IS", without warranty of any kind, express or implied.
+{% endif %}
