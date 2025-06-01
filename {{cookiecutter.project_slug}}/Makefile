@@ -43,12 +43,33 @@ ifeq ($(DEP_MANAGER), poetry)
 	poetry install
 endif
 
+ifeq ($(DEP_MANAGER), requirements)
+	@if [ ! -d $(VENV_NAME) ]; then \
+		echo "🐍 Creating virtual environment..."; \
+		python3 -m venv $(VENV_NAME); \
+	fi
+	@echo "📦 Installing dependencies from requirements files..."
+	$(PIP) install --upgrade pip
+	$(PIP) install -r requirements.txt
+	$(PIP) install -r dev-requirements.txt
+endif
+
+ifeq ($(DEP_MANAGER), pipenv)
+	@echo "📦 Installing dependencies with Pipenv..."
+	pipenv install --dev
+endif
+
+	@echo "🔁 Checking for pre-commit config..."
+	@if [ ! -f .pre-commit-config.yaml ]; then \
+		echo "⚠️ Warning: .pre-commit-config.yaml not found. Please ensure it exists."; \
+	fi
+
 	@echo "🔧 Ensuring Git is initialized..."
 	@if [ ! -d .git ]; then \
 		echo "🧰 Git repo not found. Initializing..."; \
 		git init --initial-branch=main; \
 		git add .; \
-		git commit -m "Initial commit"; \
+		git commit -m 'Initial commit'; \
 	fi
 
 	@echo "🔧 Installing pre-commit hooks..."
@@ -57,10 +78,10 @@ ifeq ($(DEP_MANAGER), poetry)
 	poetry run pre-commit run --all-files || true
 else ifeq ($(DEP_MANAGER), requirements)
 	$(VENV_NAME)/bin/pre-commit install
-	$(VENV_NAME)/bin/pre-commit run --all-files
+	$(VENV_NAME)/bin/pre-commit run --all-files || true
 else ifeq ($(DEP_MANAGER), pipenv)
 	pipenv run pre-commit install
-	pipenv run pre-commit run --all-files
+	pipenv run pre-commit run --all-files || true
 endif
 
 	@echo "✅ Setup complete."
@@ -69,7 +90,6 @@ ifeq ($(DEP_MANAGER), requirements)
 else
 	@echo "👉 Use your dependency manager's shell or activate your environment accordingly."
 endif
-
 
 .PHONY: clean
 clean:

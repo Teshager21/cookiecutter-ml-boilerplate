@@ -1,11 +1,13 @@
-# Core runtime dependencies
-pandas>=1.5.3
-numpy>=1.23.5
-scikit-learn>=1.2.2
-joblib>=1.2.0
-PyYAML>=6.0
-
-# Explicitly add compatible versions to avoid warnings
-requests==2.28.2
-urllib3>=1.26.14,<1.27
-chardet>=3.0,<4.0
+pandas==2.0.0
+scikit-learn==1.3.0
+numpy==1.24.0
+{% if cookiecutter.include_fastapi == "y" %}
+fastapi==0.95.0
+uvicorn[standard]==0.21.0
+{% endif %}
+{% if cookiecutter.use_dvc == "y" %}
+dvc[s3]==3.0.0
+{% endif %}
+{% if cookiecutter.include_mlflow == "y" %}
+mlflow==2.3.0
+{% endif %}

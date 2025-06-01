@@ -10,7 +10,8 @@ def remove_path(path):
             os.remove(path)
 
 
-# Conditions based on user input
+# --- Conditional Cleanup Based on User Inputs ---
+
 if "{{ cookiecutter.include_docker }}" != "y":
     remove_path("Dockerfile")
     remove_path("docker-compose.yml")
@@ -40,6 +41,8 @@ if "{{ cookiecutter.include_mlflow }}" != "y":
     remove_path("mlruns")
 
 
+# --- License File Handling ---
+
 license_map = {
     "MIT": "MIT.txt",
     "Apache-2.0": "Apache-2.0.txt",
@@ -54,9 +57,10 @@ if license_file:
         os.path.join("licenses", license_file),
         "LICENSE"
     )
-    # Remove the licenses directory afterwards if desired
     shutil.rmtree("licenses", ignore_errors=True)
 
+
+# --- Documentation Engine Selection ---
 
 def rename_or_remove(src_folder, dest_folder):
     if os.path.exists(dest_folder):
@@ -68,13 +72,61 @@ def rename_or_remove(src_folder, dest_folder):
 include_docs = "{{ cookiecutter.include_docs }}"
 
 if include_docs == "mkdocs":
-    rename_or_remove("sphinx_docs", "docs")  # remove sphinx_docs if exists
-    rename_or_remove("mkdocs_docs", "docs")  # rename mkdocs_docs to docs
+    rename_or_remove("sphinx_docs", "docs")
+    rename_or_remove("mkdocs_docs", "docs")
 elif include_docs == "sphinx":
-    rename_or_remove("mkdocs_docs", "docs")  # remove mkdocs_docs if exists
-    rename_or_remove("sphinx_docs", "docs")  # rename sphinx_docs to docs
-else:  # none
-    # remove all docs folders
+    rename_or_remove("mkdocs_docs", "docs")
+    rename_or_remove("sphinx_docs", "docs")
+else:
     for d in ["docs", "mkdocs_docs", "sphinx_docs"]:
-        if os.path.exists(d):
-            shutil.rmtree(d)
+        remove_path(d)
+
+
+# --- Dependency Manager File Handling ---
+
+dep_manager = "{{ cookiecutter.dependency_manager }}".lower()
+
+files_poetry = ["pyproject.toml", "poetry.lock"]
+files_pipenv = ["Pipfile", "Pipfile.lock"]
+files_requirements = ["requirements.txt", "dev-requirements.txt"]
+
+all_dep_files = set(files_poetry + files_pipenv + files_requirements)
+
+if dep_manager == "poetry":
+    for f in all_dep_files:
+        if f not in files_poetry:
+            remove_path(f)
+elif dep_manager == "pipenv":
+    for f in all_dep_files:
+        if f not in files_pipenv:
+            remove_path(f)
+elif dep_manager == "requirements":
+    for f in all_dep_files:
+        if f not in files_requirements:
+            remove_path(f)
+else:
+    print(f"Warning: Unknown dependency manager '{dep_manager}', no dependency files removed.")
+
+
+# --- Pre-commit Config Cleanup and Setup ---
+
+precommit_files = {
+    "poetry": ".pre-commit-config.poetry.yaml",
+    "pipenv": ".pre-commit-config.pipenv.yaml",
+    "requirements": ".pre-commit-config.venv.yaml",
+}
+
+selected_file = precommit_files.get(dep_manager)
+final_name = ".pre-commit-config.yaml"
+
+# Remove existing final config file if present
+remove_path(final_name)
+
+# Rename selected config to .pre-commit-config.yaml
+if selected_file and os.path.exists(selected_file):
+    shutil.move(selected_file, final_name)
+
+# Remove the unused pre-commit config files
+for key, filename in precommit_files.items():
+    if filename != selected_file:
+        remove_path(filename)
