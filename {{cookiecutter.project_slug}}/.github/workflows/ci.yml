@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.12, 3.11, 3.10]
+        python-version: ['3.12', '3.11', '3.10']
 
     steps:
       - uses: actions/checkout@v4
@@ -20,13 +20,51 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ '{{' }} matrix.python-version {{ '}}' }}
+          python-version: ${{ '{{matrix.python-version}}' }}
 
-      - name: Install dependencies
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      {% if cookiecutter.dependency_manager == "Poetry" %}
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Add Poetry to PATH
+        run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies (Poetry)
+        run: poetry install --no-interaction --no-ansi
+
+      - name: Install pre-commit (Poetry)
         run: |
-          python -m pip install --upgrade pip
+          poetry add --dev pre-commit || pip install pre-commit
+
+      {% elif cookiecutter.dependency_manager == "Pipenv" %}
+      - name: Install Pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies (Pipenv)
+        run: pipenv install --dev
+
+      - name: Install pre-commit (Pipenv)
+        run: pipenv run pip install pre-commit
+
+      {% else %}
+      - name: Install dependencies (pip)
+        run: |
           pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt || echo "No dev requirements found"
+
+      - name: Install pre-commit (pip)
+        run: pip install pre-commit
+      {% endif %}
 
       - name: Run pre-commit hooks
-        run: pre-commit run --all-files
+        run: |
+          {% if cookiecutter.dependency_manager == "Pipenv" %}
+          pipenv run pre-commit run --all-files
+          {% elif cookiecutter.dependency_manager == "Poetry" %}
+          poetry run pre-commit run --all-files
+          {% else %}
+          pre-commit run --all-files
+          {% endif %}
