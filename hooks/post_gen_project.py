@@ -19,9 +19,12 @@ if "{{ cookiecutter.include_docker }}" != "y":
 if "{{ cookiecutter.use_dvc }}" != "y":
     remove_path("dvc.yaml")
     remove_path(".dvcignore")
-    remove_path("data")
+    # remove_path("data")
 
 if "{{ cookiecutter.include_fastapi }}" != "y":
+    remove_path("api")
+
+if "{{ cookiecutter.include_api }}" != "y":
     remove_path("api")
 
 if "{{ cookiecutter.include_monitoring }}" != "y":
@@ -39,6 +42,39 @@ if "{{ cookiecutter.include_stakeholder_material }}" != "y":
 
 if "{{ cookiecutter.include_mlflow }}" != "y":
     remove_path("mlruns")
+
+if "{{ cookiecutter.include_serving }}" != "y":
+    remove_path("serving")
+    remove_path("Dockerfile.serving")  # ✅ Remove the specific serving Dockerfile
+
+if "{{ cookiecutter.include_edge_deployment }}" != "y":
+    remove_path("edge")
+
+if "{{ cookiecutter.include_infra }}" == "n":
+    remove_path("infra")
+
+if "{{ cookiecutter.include_experiments }}" != "y":
+    remove_path("experiments")
+
+if "{{ cookiecutter.include_paper }}" != "y":
+    remove_path("paper")
+
+if "{{ cookiecutter.include_demo }}" != "y":
+    remove_path("demo")
+
+if "{{ cookiecutter.include_audit }}" != "y":
+    remove_path("audit")
+
+if "{{ cookiecutter.include_contracts }}" != "y":
+    remove_path("contracts")
+
+if "{{ cookiecutter.include_references }}" != "y":
+    remove_path("references")
+
+# Clean up empty reports folder if needed
+reports_dir = "reports"
+if os.path.exists(reports_dir) and not os.listdir(reports_dir):
+    remove_path(reports_dir)
 
 
 # --- License File Handling ---

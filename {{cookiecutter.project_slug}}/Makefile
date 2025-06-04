@@ -52,6 +52,7 @@ ifeq ($(DEP_MANAGER), requirements)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
 	$(PIP) install -r dev-requirements.txt
+	$(PIP) install -e .
 endif
 
 ifeq ($(DEP_MANAGER), pipenv)
