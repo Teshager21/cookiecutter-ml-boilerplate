@@ -88,7 +88,7 @@ dep_manager = "{{ cookiecutter.dependency_manager }}".lower()
 
 files_poetry = ["pyproject.toml", "poetry.lock"]
 files_pipenv = ["Pipfile", "Pipfile.lock"]
-files_requirements = ["requirements.txt", "dev-requirements.txt"]
+files_requirements = ["requirements.txt", "dev-requirements.txt", "setup.py"]
 
 all_dep_files = set(files_poetry + files_pipenv + files_requirements)
 
