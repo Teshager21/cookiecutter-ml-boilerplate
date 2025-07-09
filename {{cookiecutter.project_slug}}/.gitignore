@@ -116,6 +116,9 @@ MANIFEST
 
 # Pre-commit
 !.pre-commit-config.yaml
+!.pre-commit-config.pipenv.yaml
+!.pre-commit-config.poetry.yaml
+!.pre-commit-config.venv.yaml
 .pre-commit-hooks.yaml
 .pre-commit-venv/
 
@@ -142,3 +145,14 @@ terraform.tfstate.*
 !.github/
 !.github/workflows/
 !.github/workflows/*.yml
+
+
+#for the cookie cutter
+!dvc.yaml
+!environment.yml
+!docker-compose.yml
+!.envrc
+!.env.example
+
+!mlruns/
+!mkdocs.yml
